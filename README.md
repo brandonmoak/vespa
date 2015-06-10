@@ -1,1 +1,3 @@
 # Myraid
+
+Python swarm library
