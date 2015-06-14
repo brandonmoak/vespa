@@ -10,10 +10,11 @@ class Comm(object):
     """
     def __init__(self, maxbufferlen=256):
         self.alive = True
-        self.setup()
+        self.connected = False
         self.inbound = deque(maxlen=256)
         self.outbound = deque(maxlen=256)
         self._spawn_threads()
+        self.launch_setup()
 
     # ################### Functions to be overwritten #########################
     # #########################################################################
@@ -22,9 +23,17 @@ class Comm(object):
         "Method for child class to send messages"
         raise NotImplementedError()
 
+    def launch_setup(self):
+        """
+        this function should be called when the connection
+        goes down
+        """
+        self._setup = threading.Thread(target=self.setup())
+
     def setup(self):
         """
-        sets up the watch thread in the child class if necessary
+        sets up the watch thread in the child class if necessary, ensures that
+        a connection has been made
         """
         pass
 
@@ -62,14 +71,24 @@ class Comm(object):
 
     def _reader(self):
         while self.alive:
-            time.sleep(.001)
-            self.watcher()
+            if self.connected:
+                try:
+                    time.sleep(.001)
+                    self.watcher()
+                except:
+                    self.connected = False
+                    self.launch_setup()
 
     def _writer(self):
         while self.alive:
-            if len(self.outbound) > 0:
-                msg, address = self.outbound.popleft()
-                self.send(msg, address)
+            if self.connected:
+                try:
+                    if len(self.outbound) > 0:
+                        msg, address = self.outbound.popleft()
+                        self.send(msg, address)
+                except:
+                    self.connected = False
+                    self.launch_setup()
 
 
 class OutboundWatch:

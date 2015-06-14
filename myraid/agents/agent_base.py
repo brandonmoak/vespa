@@ -5,7 +5,7 @@ import copy
 
 import myraid.message.message as message
 import myraid.config
-from myraid.message.messagehandler import MessageHandler, message_handler
+from myraid.message.messagehandler import MessageHandler
 from myraid.utilities.helpers import generate_random_string
 from myraid.utilities.log import LoggingMixIn
 from myraid.comm import udpcomm
@@ -20,12 +20,9 @@ class AgentBase(LoggingMixIn):
         self.alive = True
         self.networkedagents = []
         commtype, host_group = args.commtype, args.host_group
-
         self.handler = MessageHandler()
-        self.handler.subscribe_to_message_type(message.Registration,
-                                               self.add_networked_agent)
-        self.handler.subscribe_to_message_type(message.Shutdown, self.kill)
-
+        self.handler.subscribe_to_message(message.Registration,
+                                          self.add_networked_agent)
         self.config = load_config(host_group, args.agent)
         self.config.hostaddr = get_host_adress(host_group)
         self.config.agentid = generate_random_string()
@@ -69,14 +66,12 @@ class AgentBase(LoggingMixIn):
         self.comm.shutdown()
         self.alive = False
 
-    def heartbeat(self):
-        print 'heart'
-
     # ########################### Message Handlers ############################
     # #########################################################################
 
-    @message_handler(message.Registration)
     def add_networked_agent(self, msg):
+        self.logger.info(
+            'Recieved registration request from: {0}'.format(msg.name))
         agent = filter(
             lambda x: x.config.agentid == msg.senderid, self.networkedagents)
         if len(agent) == 0:
@@ -111,8 +106,10 @@ class AgentBase(LoggingMixIn):
     # #########################################################################
 
     def _spawn_threads(self):
+        self._inbox = threading.Thread(target=self._check_inbox)
         self.ticker = threading.Thread(target=self._tick)
         self.ticker.start()
+        self._inbox.start()
 
     def _tick(self):
         """
@@ -120,7 +117,6 @@ class AgentBase(LoggingMixIn):
         """
         last = time.time()
         while self.alive:
-            self._check_inbox()
             now = time.time()
             dt = now - last
             self.tick(dt)
@@ -128,9 +124,11 @@ class AgentBase(LoggingMixIn):
             time.sleep(.01)
 
     def _check_inbox(self):
-        msg = self.comm.read()
-        if msg is not None:
-            self.handler.handle_message(msg)
+        while self.alive:
+            msg = self.comm.read()
+            if msg is not None:
+                self.handler.handle_message(msg)
+            time.sleep(.01)
 
 # ###########################  Networked Agent  ###########################
 # #########################################################################

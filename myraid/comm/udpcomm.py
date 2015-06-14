@@ -11,9 +11,21 @@ class UDPComm(Comm):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(self.config.address)
 
+        while not self.connected:
+            try:
+                self.sock.settimeout(.1)
+                data, addr = self.sock.recvfrom(1024)
+                self.inbound.append(data)
+                self.connected = True
+            except socket.timeout:
+                self.connected = True
+            except Exception, e:
+                print e
+                self.connected = False
+
     def watcher(self):
-        self.sock.settimeout(.1)
         try:
+            self.sock.settimeout(.1)
             data, addr = self.sock.recvfrom(1024)
             self.inbound.append(data)
         except socket.timeout:

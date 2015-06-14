@@ -13,6 +13,6 @@ class LoggingMixIn(object):
               " %(levelname)s "
               "%(message)s")
         DATEFMT = '%I:%M:%S'
-        logging.basicConfig(format=FT,
-                            datefmt=DATEFMT,
-                            level=levels.get(args.log_level, logging.INFO))
+        self.logger.basicConfig(format=FT,
+                                datefmt=DATEFMT,
+                                level=levels.get(args.log_level, logging.INFO))

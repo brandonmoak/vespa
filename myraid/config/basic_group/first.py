@@ -3,4 +3,3 @@ import myraid.config.agent as agent
 
 class Config(agent.Config):
     address = ('127.0.0.1', 45000)
-    first = ''

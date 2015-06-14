@@ -27,12 +27,12 @@ class Message(object):
     def flatten(self):
         st = pickle.dumps(self)
         return st
-        #check if all field are filled in
+        # check if all field are filled in
 
     @classmethod
     def unflatten(self, msg):
         return pickle.loads(msg)
-        #recontruct message object
+        # recontruct message object
 
 
 class Registration(Message):
