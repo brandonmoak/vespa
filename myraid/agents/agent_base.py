@@ -3,18 +3,20 @@ import time
 import argparse
 import copy
 
-from myraid.message.messagehandler import MessageHandler, message_handler
 import myraid.message.message as message
-from myraid.utilities.helpers import generate_random_string
 import myraid.config
+from myraid.message.messagehandler import MessageHandler, message_handler
+from myraid.utilities.helpers import generate_random_string
+from myraid.utilities.log import LoggingMixIn
 from myraid.comm import udpcomm
 
 
-class AgentBase(object):
+class AgentBase(LoggingMixIn):
     """
     Base class for each agent, handles all communication between agents
     """
     def __init__(self, args):
+        super(AgentBase, self).__init__(args)
         self.alive = True
         self.networkedagents = []
         commtype, host_group = args.commtype, args.host_group
@@ -198,6 +200,6 @@ def get_default_parser():
                         help='name of agent that is to be launched')
     parser.add_argument('--commtype',
                         help='type of communication that agents use')
+    parser.add_argument('--log_level',
+                        help='severity of logging to print')
     return parser
-
-
