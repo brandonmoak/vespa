@@ -1,5 +1,5 @@
 #! /usr/bin/python
-# Launches an agent in a new window, currently only tested on windows
+# Launches an agent in a new shell window, currently only tested on windows
 from subprocess import Popen, STDOUT
 import psutil
 import sys
@@ -16,7 +16,7 @@ def kill(proc_pid):
 if __name__ == '__main__':
     try:
         args = " ".join(sys.argv[1:])
-        p = Popen('python -m myraid.agents.basic_agent {0}'.format(args),
+        p = Popen('python -m myraid.agents.agent_launcher {0}'.format(args),
                   stderr=STDOUT,
                   shell=True)
         while True:

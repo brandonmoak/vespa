@@ -1,10 +1,16 @@
 import agent_base
 import time
 
+from myraid.message.message import Registration
+
 
 class BasicAgent(agent_base.AgentBase):
-    def __init__(self, args):
-        super(BasicAgent, self).__init__(args)
+    def __init__(self, config, args):
+        super(BasicAgent, self).__init__(config, args)
+        self.handler.subscribe_to_message(Registration, self.on_register)
+
+    def on_register(self, msg):
+        self.logger.info('on registration')
 
     def tick(self, dt):
         print '-------Networked Agents----------'
@@ -16,4 +22,4 @@ parser = agent_base.get_default_parser()
 args = parser.parse_args()
 
 if __name__ == '__main__':
-    BasicAgent(args)
+    BasicAgent(load_config(args.agent), args)

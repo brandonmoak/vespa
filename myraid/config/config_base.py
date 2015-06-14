@@ -1,3 +1,7 @@
+class OverrideRequired:
+    def __str__(self):
+        return 'Attribute must be over written in config'
+
 class Config:
     @classmethod
     def attribute_set(config):
@@ -9,4 +13,12 @@ class Config:
 
     @classmethod
     def attribute_list(config):
-        list(config.attribute_set())
+        return list(config.attribute_set())
+
+    @classmethod
+    def verify_override(config):
+        attrs = config.attribute_list()
+        for attr in attrs:
+            if getattr(config, attr) == OverrideRequired:
+                mod = config.__dict__['__module__']
+                raise NotImplementedError('{0} must be overridden in subconfig {1}'.format(attr, mod))

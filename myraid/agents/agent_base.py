@@ -15,7 +15,7 @@ class AgentBase(LoggingMixIn):
     """
     Base class for each agent, handles all communication between agents
     """
-    def __init__(self, args):
+    def __init__(self, config, args):
         super(AgentBase, self).__init__(args)
         self.alive = True
         self.networkedagents = []
@@ -23,7 +23,7 @@ class AgentBase(LoggingMixIn):
         self.handler = MessageHandler()
         self.handler.subscribe_to_message(message.Registration,
                                           self.add_networked_agent)
-        self.config = load_config(host_group, args.agent)
+        self.config = config
         self.config.hostaddr = get_host_adress(host_group)
         self.config.agentid = generate_random_string()
         self.config.name = args.agent
@@ -33,7 +33,7 @@ class AgentBase(LoggingMixIn):
         self.comm = load_commtype(commtype, self.config)
 
         self._spawn_threads()
-        self.register_with_host()
+        self.timer(2, self.register_with_host)
 
     # ################### Functions to be overwritten #########################
     # #########################################################################
@@ -65,6 +65,10 @@ class AgentBase(LoggingMixIn):
     def kill(self):
         self.comm.shutdown()
         self.alive = False
+
+    def timer(self, timeout, function, *args, **kwargs):
+        t = threading.Timer(timeout, function, *args, **kwargs)
+        t.start()
 
     # ########################### Message Handlers ############################
     # #########################################################################
@@ -168,6 +172,7 @@ def load_config(host_group, name):
     package = myraid.config
     prefix = ".".join([package.__name__, host_group])
     config = __import__('.'.join([prefix, name]), fromlist=package.__name__)
+    config.Config.verify_override()
     return copy.deepcopy(config.Config)
 
 

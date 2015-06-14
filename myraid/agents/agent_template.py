@@ -24,8 +24,8 @@ class Agent(agent_base.AgentBase):
     that the nodes can communicate with each other directly based on their
     specified function.
     """
-    def __init__(self, args):
-        super(Agent, self).__init__(args.config, args.commtype, args.host)
+    def __init__(self, config, args):
+        super(Agent, self).__init__(config, args)
 
     def tick(self, dt):
         """
@@ -54,4 +54,4 @@ class Agent(agent_base.AgentBase):
 # ##########################################################
 
 if __name__ == '__main__':
-    Agent(args)
+    Agent(load_config(args.agent), args)

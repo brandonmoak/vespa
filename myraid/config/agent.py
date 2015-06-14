@@ -8,8 +8,10 @@ class Config(config_base.Config):
     these attributes
 
     """
+    # reference to the Agent class that will run 
+    _launcher = config_base.OverrideRequired
     # location of agent
-    address = object
+    address = config_base.OverrideRequired
     # address of host agent
     hostaddr = object
     # agent id generated when agent spawns
