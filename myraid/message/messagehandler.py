@@ -2,6 +2,7 @@ import threading
 import time
 from message import Message
 from myraid.utilities.helpers import Enum, generate_random_string
+from collections import deque
 
 HandlerStatus = Enum(['initialized', 'processing', 'error', 'stopped'])
 
@@ -14,7 +15,7 @@ class MessageHandler:
     def __init__(self):
         self.lookup = {}
         self.workers = []
-        self.unprocessed = []
+        self.unprocessed = deque(maxlen=200)
         self.alive = True
         self._watcher = threading.Thread(target=self._watch)
         self._watcher.start()
@@ -42,7 +43,7 @@ class MessageHandler:
 
             for worker in _stopped:
                 try:
-                    print 'deleting', worker
+                    # print 'deleting', worker
                     del self.workers[self.workers.index(worker)]
                 except Exception, e:
                     print e
@@ -60,7 +61,7 @@ class MessageHandler:
                      '_workerid': wid}
                     )
         else:
-            print 'unprocessed', message.__dict__
+            #print 'unprocessed', message.__dict__
             self.unprocessed.append(message)
 
     def subscribe_to_message(self, messagetype, function):
@@ -75,7 +76,8 @@ class MessageHandler:
         try:
             handler(message)
         except Exception, e:
-            print e
+            emsg = 'Error in handler - {0}: {1}'.format(handler.__name__, e)
+            print emsg
             worker = filter(
                 lambda x: x['_workerid'] == workerid, self.workers)[0]
             worker['_status'] = HandlerStatus.error

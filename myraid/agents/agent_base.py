@@ -32,7 +32,7 @@ class AgentBase(LoggingMixIn):
 
         self.comm = load_commtype(commtype, self.config)
 
-        self._spawn_threads()
+        self.timer(1, self._spawn_threads)
         self.timer(2, self.register_with_host)
 
     # ################### Functions to be overwritten #########################
@@ -74,11 +74,12 @@ class AgentBase(LoggingMixIn):
     # #########################################################################
 
     def add_networked_agent(self, msg):
-        self.logger.info(
-            'Recieved registration request from: {0}'.format(msg.name))
+        
         agent = filter(
             lambda x: x.config.agentid == msg.senderid, self.networkedagents)
         if len(agent) == 0:
+            self.logger.info(
+            'Recieved registration request from: {0}'.format(msg.name))
             # pass on new node to the rest of the network
             self.message_all_agents(msg)
 
@@ -117,15 +118,18 @@ class AgentBase(LoggingMixIn):
 
     def _tick(self):
         """
-        fires on a regular basis, tasks will be processed here
+        fires on a regular basis, calls main loop in child class
         """
         last = time.time()
         while self.alive:
-            now = time.time()
-            dt = now - last
-            self.tick(dt)
-            last = time.time()
-            time.sleep(.01)
+            # try:
+                now = time.time()
+                dt = now - last
+                self.tick(dt)
+                last = time.time()
+                time.sleep(.01)
+            # except Exception, e:
+            #     print e
 
     def _check_inbox(self):
         while self.alive:

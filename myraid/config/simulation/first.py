@@ -1,4 +1,5 @@
 import myraid.config.shape_agent as shape_agent
 
 class Config(shape_agent.Config):
-    pass
+    address = ('127.0.0.1', 45000)
+    name = 'first'

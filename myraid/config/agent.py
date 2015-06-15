@@ -17,6 +17,6 @@ class Config(config_base.Config):
     # agent id generated when agent spawns
     agentid = str
     # name of agent
-    name = str
+    name = config_base.OverrideRequired
     # type of agent
     agenttype = str

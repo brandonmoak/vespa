@@ -1,19 +1,24 @@
 from agent_base import AgentBase, get_default_parser
 import myraid.message.message as message
+import window_agent
 
 
 class ShapeAgent(AgentBase):
     def __init__(self, config, args):
         super(ShapeAgent, self).__init__(config, args)
+        self.handler.subscribe_to_message(window_agent.MouseUpdate, self.on_mouse_update)
 
     def tick(self, dt):
         self.resolve_contraints()
         self.message_all_agents(
-            ShapeUpdate(self.agentid,
+            ShapeUpdate(self.config.agentid,
                         'all',
                         self.config.x,
                         self.config.y,
                         self.config.size))
+
+    def on_mouse_update(self, msg):
+        self.logger.debug([msg.messageid, msg.senderid, msg.x, msg.y])
 
     def move(self, dx, dy):
         self.config.x += dx
