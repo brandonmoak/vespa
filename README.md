@@ -1,3 +1,3 @@
-# Myraid
+# Vespa
 
 Python swarm library
