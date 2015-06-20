@@ -1,7 +1,7 @@
 import threading
 import time
 from message import Message
-from myraid.utilities.helpers import Enum, generate_random_string
+from vespa.utilities.helpers import Enum, generate_random_string
 from collections import deque
 
 HandlerStatus = Enum(['initialized', 'processing', 'error', 'stopped'])

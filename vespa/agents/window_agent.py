@@ -1,9 +1,7 @@
-import time
-from myraid.message.message import Registration, Message
+from vespa.message.message import Registration, Message
 from agent_base import AgentBase, get_default_parser, load_config
 import shape_agent
-import myraid.plotting.window as window
-import copy
+import vespa.plotting.window as window
 
 
 class WindowAgent(AgentBase):
@@ -15,7 +13,6 @@ class WindowAgent(AgentBase):
             self.config.win_y)
         self.handler.subscribe_to_message(Registration, self.create_new_shape)
         self.handler.subscribe_to_message(shape_agent.ShapeUpdate, self.position_update)
-        
 
     def tick(self, dt):
         pos = self.win.get_last_mouse_pos()
@@ -52,7 +49,6 @@ class WindowAgent(AgentBase):
                                    agent.config.x,
                                    agent.config.y)
 
-            
 
 class MouseUpdate(Message):
     def __init__(self, senderid, receiverid, x, y):

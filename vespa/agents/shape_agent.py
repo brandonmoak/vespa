@@ -1,5 +1,5 @@
 from agent_base import AgentBase, get_default_parser
-import myraid.message.message as message
+import vespa.message.message as message
 import window_agent
 
 

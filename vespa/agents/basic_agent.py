@@ -1,7 +1,7 @@
 import agent_base
 import time
 
-from myraid.message.message import Registration
+from vespa.message.message import Registration
 
 
 class BasicAgent(agent_base.AgentBase):
@@ -22,4 +22,4 @@ parser = agent_base.get_default_parser()
 args = parser.parse_args()
 
 if __name__ == '__main__':
-    BasicAgent(load_config(args.agent), args)
+    BasicAgent(agent_base.load_config(args.agent), args)

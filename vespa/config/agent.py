@@ -8,7 +8,7 @@ class Config(config_base.Config):
     these attributes
 
     """
-    # reference to the Agent class that will run 
+    # reference to the Agent class that will run
     _launcher = config_base.OverrideRequired
     # location of agent
     address = config_base.OverrideRequired

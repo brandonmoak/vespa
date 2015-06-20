@@ -3,12 +3,12 @@ import time
 import argparse
 import copy
 
-import myraid.message.message as message
-import myraid.config
-from myraid.message.messagehandler import MessageHandler
-from myraid.utilities.helpers import generate_random_string
-from myraid.utilities.log import LoggingMixIn
-from myraid.comm import udpcomm
+import vespa.message.message as message
+import vespa.config
+from vespa.message.messagehandler import MessageHandler
+from vespa.utilities.helpers import generate_random_string
+from vespa.utilities.log import LoggingMixIn
+from vespa.comm import udpcomm
 
 
 class AgentBase(LoggingMixIn):
@@ -173,7 +173,7 @@ def load_commtype(commtype, agentconfig):
 
 
 def load_config(host_group, name):
-    package = myraid.config
+    package = vespa.config
     prefix = ".".join([package.__name__, host_group])
     config = __import__('.'.join([prefix, name]), fromlist=package.__name__)
     config.Config.verify_override()
@@ -191,7 +191,7 @@ def get_host_adress(host_group):
     been defined in the __init__ of the host_group.
     see .config.host_group.__init__ for example
     """
-    package = myraid.config
+    package = vespa.config
     module = '.'.join([package.__name__, host_group])
     module = __import__(module, fromlist=package.__name__)
     if module.host is not None:

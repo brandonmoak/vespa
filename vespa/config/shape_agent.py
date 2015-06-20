@@ -1,5 +1,5 @@
 import agent
-import myraid.agents.shape_agent as shape_agent
+import vespa.agents.shape_agent as shape_agent
 
 
 class Config(agent.Config):

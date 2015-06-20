@@ -1,5 +1,5 @@
 import agent
-import myraid.agents.window_agent as window_agent
+import vespa.agents.window_agent as window_agent
 
 class Config(agent.Config):
     _launcher = window_agent.WindowAgent
