@@ -3,11 +3,11 @@ import time
 import argparse
 import copy
 
-from myraid.message.messagehandler import MessageHandler, message_handler
-import myraid.message.message as message
-from myraid.utilities.helpers import generate_random_string
-import myraid.config
-from myraid.comm import udpcomm
+from vespa.message.messagehandler import MessageHandler, message_handler
+import vespa.message.message as message
+from vespa.utilities.helpers import generate_random_string
+import vespa.config
+from vespa.comm import udpcomm
 
 
 class AgentBase(object):
@@ -165,7 +165,7 @@ def load_commtype(commtype, agentconfig):
 
 
 def load_config(host_group, name):
-    package = myraid.config
+    package = vespa.config
     prefix = ".".join([package.__name__, host_group])
     config = __import__('.'.join([prefix, name]), fromlist=package.__name__)
     return copy.deepcopy(config.Config)
@@ -182,7 +182,7 @@ def get_host_adress(host_group):
     been defined in the __init__ of the host_group.
     see .config.host_group.__init__ for example
     """
-    package = myraid.config
+    package = vespa.config
     module = '.'.join([package.__name__, host_group])
     module = __import__(module, fromlist=package.__name__)
     if module.host is not None:
@@ -199,5 +199,3 @@ def get_default_parser():
     parser.add_argument('--commtype',
                         help='type of communication that agents use')
     return parser
-
-
