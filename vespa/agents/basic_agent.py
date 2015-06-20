@@ -15,7 +15,9 @@ class BasicAgent(agent_base.AgentBase):
     def tick(self, dt):
         print '-------Networked Agents----------'
         for netagent in self.networkedagents:
-            self.logger.info([netagent.config.agentname, netagent.config.address, netagent.config.agentid])
+            self.logger.info([netagent.config.agentname,
+                              netagent.config.address,
+                              netagent.config.agentid])
         time.sleep(.5)
 
 parser = agent_base.get_default_parser()

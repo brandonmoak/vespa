@@ -1,4 +1,4 @@
-from agent_base import AgentBase, get_default_parser
+from agent_base import AgentBase, get_default_parser, load_config
 import vespa.message.message as message
 import window_agent
 
@@ -10,15 +10,17 @@ class ShapeAgent(AgentBase):
 
     def tick(self, dt):
         self.resolve_contraints()
+
+    def on_mouse_update(self, msg):
+        self.logger.info([msg.timestamp, msg.x, msg.y])
+        self.config.x = msg.x
+        self.config.y = msg.y
         self.message_all_agents(
             ShapeUpdate(self.config.agentid,
                         'all',
                         self.config.x,
                         self.config.y,
                         self.config.size))
-
-    def on_mouse_update(self, msg):
-        self.logger.debug([msg.messageid, msg.senderid, msg.x, msg.y])
 
     def move(self, dx, dy):
         self.config.x += dx

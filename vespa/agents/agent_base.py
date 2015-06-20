@@ -74,12 +74,11 @@ class AgentBase(LoggingMixIn):
     # #########################################################################
 
     def add_networked_agent(self, msg):
-        
         agent = filter(
             lambda x: x.config.agentid == msg.senderid, self.networkedagents)
-        if len(agent) == 0:
+        if len(agent) == 0 and msg.senderid != self.config.agentid:
             self.logger.info(
-            'Recieved registration request from: {0}'.format(msg.name))
+                'Recieved registration request from: {0}'.format(msg.name))
             # pass on new node to the rest of the network
             self.message_all_agents(msg)
 
@@ -127,7 +126,6 @@ class AgentBase(LoggingMixIn):
                 dt = now - last
                 self.tick(dt)
                 last = time.time()
-                time.sleep(.01)
             # except Exception, e:
             #     print e
 

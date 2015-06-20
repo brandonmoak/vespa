@@ -54,4 +54,4 @@ class Agent(agent_base.AgentBase):
 # ##########################################################
 
 if __name__ == '__main__':
-    Agent(load_config(args.agent), args)
+    Agent(agent_base.load_config(args.agent), args)

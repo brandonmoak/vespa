@@ -3,6 +3,9 @@ import subprocess
 
 
 def launch_windows_basic_locally():
+    '''
+    run in windows terminal or powershell
+    '''
     host_group = 'basic_group'
     commtype = 'udp'
     config_to_launch = ['first', 'second', 'third']
@@ -17,6 +20,9 @@ def launch_windows_basic_locally():
 
 
 def lanch_windows_simulation_locally():
+    '''
+    run in windows terminal or powershell
+    '''
     host_group = 'simulation'
     commtype = 'udp'
     config_to_launch = ['window', 'first']

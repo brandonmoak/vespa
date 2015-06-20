@@ -17,12 +17,14 @@ class WindowAgent(AgentBase):
     def tick(self, dt):
         pos = self.win.get_last_mouse_pos()
         if pos is not None:
-            self.config.mouse_x, self.config.mouse_y = pos[0], pos[1]
-            self.message_all_agents(
-                MouseUpdate(self.config.agentid,
-                            'all',
-                            self.config.mouse_x,
-                            self.config.mouse_y))
+            if (self.config.mouse_x, self.config.mouse_y) != pos:
+                self.logger.info(pos)
+                self.config.mouse_x, self.config.mouse_y = pos[0], pos[1]
+                self.message_all_agents(
+                    MouseUpdate(self.config.agentid,
+                                'all',
+                                self.config.mouse_x,
+                                self.config.mouse_y))
 
     def create_new_shape(self, msg):
         # find out who the message came from
@@ -37,17 +39,18 @@ class WindowAgent(AgentBase):
         agent = next((i for i in self.networkedagents if
                       i.config.agentid == msg.senderid), None)
         if agent is not None:
-            agent.config.x = msg.x
-            agent.config.y = msg.y
-            agent.config.size = msg.size
-            p = '{2}| x: {0} y: {1}'.format(agent.config.x,
-                                            agent.config.y,
-                                            agent.config.name)
-            self.logger.debug(p)
+            if (msg.x, msg.y) != (agent.config.x, agent.config.y):
+                agent.config.x = msg.x
+                agent.config.y = msg.y
+                agent.config.size = msg.size
+                p = '{2}| x: {0} y: {1}'.format(agent.config.x,
+                                                agent.config.y,
+                                                agent.config.name)
+                self.logger.info(p)
 
-            self.win.set_shape_pos(msg.senderid,
-                                   agent.config.x,
-                                   agent.config.y)
+                self.win.set_shape_pos(msg.senderid,
+                                       agent.config.x,
+                                       agent.config.y)
 
 
 class MouseUpdate(Message):

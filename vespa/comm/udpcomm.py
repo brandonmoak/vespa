@@ -14,7 +14,7 @@ class UDPComm(Comm):
         while not self.connected:
             try:
                 self.sock.settimeout(.1)
-                data, addr = self.sock.recvfrom(1024)
+                data = self.sock.recv(1024)
                 self.inbound.append(data)
                 self.connected = True
             except socket.timeout:
@@ -27,11 +27,13 @@ class UDPComm(Comm):
         try:
             self.sock.settimeout(.1)
             data, addr = self.sock.recvfrom(1024)
+            #print 'recieved', len(data)
             self.inbound.append(data)
         except socket.timeout:
             pass
 
     def send(self, message, destination):
+        #print 'sending', len(message)
         self.sock.sendto(message, destination)
 
     def shutdown(self):
