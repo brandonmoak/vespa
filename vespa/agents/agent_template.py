@@ -1,5 +1,5 @@
 import agent_base
-# from myraid.message.messagehandler import message_handler
+# from vespa.message.messagehandler import message_handler
 
 ###############################################################
 # Arguments passed from launching the agent

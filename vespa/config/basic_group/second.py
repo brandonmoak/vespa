@@ -1,4 +1,4 @@
-import myraid.config.agent as agent
+import vespa.config.agent as agent
 
 
 class Config(agent.Config):
