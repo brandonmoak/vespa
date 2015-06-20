@@ -2,7 +2,7 @@ import argparse
 import time
 
 from agent_base import AgentBase
-from myraid.message.messagehandler import message_handler
+from vespa.message.messagehandler import message_handler
 from shape_agent import ShapeUpdate, ShapeAgent
 
 

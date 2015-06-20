@@ -1,7 +1,7 @@
 import time
 import pickle
 
-from myraid.utilities.helpers import generate_random_string
+from vespa.utilities.helpers import generate_random_string
 
 
 class Message(object):

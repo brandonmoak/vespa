@@ -16,7 +16,7 @@ def kill(proc_pid):
 if __name__ == '__main__':
     try:
         args = " ".join(sys.argv[1:])
-        p = Popen('python -m myraid.agents.basic_agent {0}'.format(args),
+        p = Popen('python -m vespa.agents.basic_agent {0}'.format(args),
                   stderr=STDOUT,
                   shell=True)
         while True:
