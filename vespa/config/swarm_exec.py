@@ -9,8 +9,9 @@ class Config(agent.Config):
     constraints = config_base.OverrideRequired
     # name
     name = 'swarm_exec'
-    # address = needs override in subclass
+    # address needs override in subclass
     # address = (ip, port)
+    centroid = None
 
     @classmethod
     def resolve(config, agent_positions):
@@ -24,6 +25,9 @@ class Config(agent.Config):
         return agent_positions
 
     @classmethod
-    def position_template(config):
-        return {'pos': None, 'target': []}
+    def position_template(config, agents):
+        tem = {}
+        for agent in agents:
+            tem[agent] = {'pos': None, 'target': []}
+        return tem
 

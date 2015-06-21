@@ -15,10 +15,10 @@ class SwarmExecutive(agent_base.AgentBase):
         to process its own tasks
         """
         self.sleep(.5)
-        p, q = self.config.position_template(), self.config.position_template()
-        p['pos'], q['pos'] = [40], [25]
-        positions = {'first': p, 'centroid': q}
-        self.config.resolve(positions)
+        positions = self.config.position_template(['first', 'centroid'])
+        positions['first']['pos'] = [25]
+        positions['centroid']['pos'] = [10]
+        print self.config.resolve(positions)
 
     def broadcast_positions(self):
         """
