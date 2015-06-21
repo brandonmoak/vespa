@@ -5,5 +5,5 @@ import vespa.config.constraints as con
 defined_constraints = [
     # indicates that second should always be 10 units away from first
     # in a singular dimension
-    con.FixedDistance1D(['first', 'second'], length=10),
+    con.FixedDistance1D(['centroid', 'first'], length=10),
 ]

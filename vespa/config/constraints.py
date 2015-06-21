@@ -6,30 +6,6 @@ import math
 MeshType = Enum(['dynamic', 'hierarchical'])
 
 # #############################################################################
-# ############################ Constraint Config ##############################
-# #############################################################################
-
-class Config(config_base.Config):
-    """
-    Base config object for constraints
-    """
-    constraints = config_base.OverrideRequired
-
-    @classmethod
-    def resolve(config, agent_positions):
-        # sets the target for the agent postiton
-        # agent_positions = {'name' : {'pos': val, 'target': []}}
-        
-        for constraint in config.constraints:
-            seln = [agent_positions[n]['pos'][:constraint.ndim] for n in constraint.agents]
-            results = constraint.resolve(*seln)
-            for name, result in zip(constraint.agents, results):
-                agent_positions[n]['target'].append(result)
-
-        return agent_positions
-
-
-# #############################################################################
 # ############################ Common Constraint ##############################
 # #############################################################################
 
@@ -53,9 +29,6 @@ class Constraint(object):
         """
         raise NotImplementedError
 
-
-
-
 # #############################################################################
 # ########################### Distance Constraints ############################
 # #############################################################################
@@ -71,18 +44,18 @@ class FixedDistance1D(FixedDistance):
     def __init__(self, agents, length, tolerance=0, meshtype=MeshType.hierarchical, ndim=1):
         super(FixedDistance1D, self).__init__(agents, length, tolerance, meshtype, ndim)
 
-    def resolve(config, posA, posB):
-        if config.mesh_type == MeshType.hierarchical:
-            diff = posB - posA
-            if abs(diff) - config.length < config.tolerance:
+    def resolve(self, posA, posB):
+        if self.meshtype == MeshType.hierarchical:
+            diff = posB[0] - posA[0]
+            if abs(abs(diff) - self.length) < self.tolerance:
                 return posA, posB
-            return posA, posB + math.copysign((config.length - abs(diff)), diff)
+            return [posA, [posB[0] + math.copysign(self.length, diff) - diff ]]
 
 
 class FixedDistance2D(FixedDistance):
     def __init__(self, agents, length, tolerance=0, meshtype=MeshType.hierarchical, ndim=2):
         super(FixedDistance2D, self).__init__(agents, length, tolerance, meshtype, ndim)
     
-    def resolve(config, posA, posB):
+    def resolve(self, posA, posB):
         pass
     

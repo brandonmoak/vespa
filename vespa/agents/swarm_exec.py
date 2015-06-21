@@ -14,8 +14,11 @@ class SwarmExecutive(agent_base.AgentBase):
         called on a regular basis, this is the main loop for each agent
         to process its own tasks
         """
-        print 'tick'
-        self.logger.info(self.config.constraints)
+        self.sleep(.5)
+        p, q = self.config.position_template(), self.config.position_template()
+        p['pos'], q['pos'] = [40], [25]
+        positions = {'first': p, 'centroid': q}
+        self.config.resolve(positions)
 
     def broadcast_positions(self):
         """

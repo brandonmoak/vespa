@@ -25,7 +25,7 @@ def lanch_windows_simulation_locally():
     '''
     collection = 'simulation'
     commtype = 'udp'
-    config_to_launch = ['window', 'first', 'swarm_exec']
+    config_to_launch = ['swarm_exec', ]#'window', 'first', ]
     for config in config_to_launch:
         subprocess.Popen([sys.executable,
                           'launcher.py',
@@ -34,3 +34,6 @@ def lanch_windows_simulation_locally():
                           '--collection', collection],
                          creationflags=subprocess.CREATE_NEW_CONSOLE)
 lanch_windows_simulation_locally()
+
+
+

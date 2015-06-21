@@ -71,6 +71,9 @@ class AgentBase(LoggingMixIn):
         self.comm.shutdown()
         self.alive = False
 
+    def sleep(self, t):
+        time.sleep(t)
+
     def timer(self, timeout, function, *args, **kwargs):
         t = threading.Timer(timeout, function, *args, **kwargs)
         t.start()
@@ -127,13 +130,13 @@ class AgentBase(LoggingMixIn):
         """
         last = time.time()
         while self.alive:
-            try:
+            # try:
                 now = time.time()
                 dt = now - last
                 self.tick(dt)
                 last = time.time()
-            except Exception, e:
-                print e
+            # except Exception, e:
+            #     print e
 
     def _check_inbox(self):
         while self.alive:

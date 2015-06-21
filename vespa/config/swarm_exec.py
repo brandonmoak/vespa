@@ -12,3 +12,18 @@ class Config(agent.Config):
     # address = needs override in subclass
     # address = (ip, port)
 
+    @classmethod
+    def resolve(config, agent_positions):
+        # sets the target for the agent postiton
+        # agent_positions = {'name' : {'pos': val, 'target': []}}
+        for constraint in config.constraints:
+            seln = [agent_positions[n]['pos'][:constraint.ndim] for n in constraint.agents]
+            results = constraint.resolve(*seln)
+            for name, result in zip(constraint.agents, results):
+                agent_positions[name]['target'].append(result)
+        return agent_positions
+
+    @classmethod
+    def position_template(config):
+        return {'pos': None, 'target': []}
+
