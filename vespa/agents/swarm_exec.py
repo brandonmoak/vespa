@@ -1,5 +1,4 @@
 import agent_base
-# from vespa.event.messagehandler import message_handler
 
 parser = agent_base.get_default_parser()
 args = parser.parse_args()
@@ -16,8 +15,8 @@ class SwarmExecutive(agent_base.AgentBase):
         """
         self.sleep(.5)
         positions = self.config.position_template(['first', 'centroid'])
-        positions['first']['pos'] = [25]
-        positions['centroid']['pos'] = [10]
+        positions['first']['pos'] = [-3, -4]
+        positions['centroid']['pos'] = [0, 0]
         print self.config.resolve(positions)
 
     def broadcast_positions(self):
