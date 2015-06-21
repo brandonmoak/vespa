@@ -20,3 +20,5 @@ class Config(config_base.Config):
     name = config_base.OverrideRequired
     # type of agent
     agenttype = str
+    # local agents to run
+    local_agents = []

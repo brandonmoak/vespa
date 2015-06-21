@@ -1,7 +1,7 @@
-from vespa.message.message import Registration, Message
+from vespa.event.message import Registration, Message
 from agent_base import AgentBase, get_default_parser, load_config
 import shape_agent
-import vespa.plotting.window as window
+import vespa.drivers.window as window
 
 
 class WindowAgent(AgentBase):
@@ -12,7 +12,8 @@ class WindowAgent(AgentBase):
             self.config.win_x,
             self.config.win_y)
         self.handler.subscribe_to_message(Registration, self.create_new_shape)
-        self.handler.subscribe_to_message(shape_agent.ShapeUpdate, self.position_update)
+        self.handler.subscribe_to_message(shape_agent.ShapeUpdate,
+                                          self.position_update)
 
     def tick(self, dt):
         pos = self.win.get_last_mouse_pos()
@@ -28,10 +29,13 @@ class WindowAgent(AgentBase):
 
     def create_new_shape(self, msg):
         # find out who the message came from
+        self.logger.info(self.networkedagents)
         agent = next((i for i in self.networkedagents if
                       i.config.agentid == msg.senderid), None)
-        if agent is None:
+
+        if agent is not None:
             # Initialize on window
+            self.logger.info('adding: ' + msg.senderid)
             self.win.add_circle(msg.senderid, x=0, y=0, rad=10)
 
     def position_update(self, msg):
@@ -63,4 +67,4 @@ parser = get_default_parser()
 args = parser.parse_args()
 
 if __name__ == '__main__':
-    WindowAgent(load_config(args.agent), args)
+    WindowAgent(load_config(args.collection, args.agent), args)

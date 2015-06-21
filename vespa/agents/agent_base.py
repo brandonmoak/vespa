@@ -3,9 +3,9 @@ import time
 import argparse
 import copy
 
-import vespa.message.message as message
+import vespa.event.message as message
 import vespa.config
-from vespa.message.messagehandler import MessageHandler
+from vespa.event.messagehandler import MessageHandler
 from vespa.utilities.helpers import generate_random_string
 from vespa.utilities.log import LoggingMixIn
 from vespa.comm import udpcomm
@@ -19,21 +19,26 @@ class AgentBase(LoggingMixIn):
         super(AgentBase, self).__init__(args)
         self.alive = True
         self.networkedagents = []
-        commtype, host_group = args.commtype, args.host_group
+        commtype, collection = args.commtype, args.collection
         self.handler = MessageHandler()
         self.handler.subscribe_to_message(message.Registration,
                                           self.add_networked_agent)
         self.config = config
-        self.config.hostaddr = get_host_adress(host_group)
+        self.config.hostaddr = get_host_adress(collection)
         self.config.agentid = generate_random_string()
         self.config.name = args.agent
-        self.config.host_group = host_group
+        self.config.collection = collection
         self.config.commtype = commtype
 
         self.comm = load_commtype(commtype, self.config)
 
         self.timer(1, self._spawn_threads)
-        self.timer(2, self.register_with_host)
+        self.timer(2, self.register_with_exec)
+
+        self.logger.info('[AGENT] ' + ', '.join([self.config.name,
+                                                self.config.collection,
+                                                self.config.agentid,
+                                                str(self.config.address)]))
 
     # ################### Functions to be overwritten #########################
     # #########################################################################
@@ -44,10 +49,10 @@ class AgentBase(LoggingMixIn):
     # ########################## Public functions #############################
     # #########################################################################
 
-    def register_with_host(self):
+    def register_with_exec(self):
         self.enqueue_message(
             message.Registration(
-                self.config.host_group,
+                self.config.collection,
                 self.config.name,
                 type(self),
                 self.config.agentid,
@@ -85,7 +90,7 @@ class AgentBase(LoggingMixIn):
             # add store list of agents on network
             newagent = NetworkedAgent(
                 self.comm,
-                msg.host_group,
+                msg.collection,
                 msg.name,
                 msg.type,
                 msg.senderid,
@@ -95,7 +100,7 @@ class AgentBase(LoggingMixIn):
             # respond to registration
             newagent.send_message_to(
                 message.Registration(
-                    self.config.host_group,
+                    self.config.collection,
                     self.config.name,
                     type(self),
                     self.config.agentid,
@@ -105,6 +110,7 @@ class AgentBase(LoggingMixIn):
         else:
             # Agent already in network
             pass
+        self.logger.debug(self.networkedagents)
 
     # ########################### Private functions ###########################
     # #########################################################################
@@ -121,13 +127,13 @@ class AgentBase(LoggingMixIn):
         """
         last = time.time()
         while self.alive:
-            # try:
+            try:
                 now = time.time()
                 dt = now - last
                 self.tick(dt)
                 last = time.time()
-            # except Exception, e:
-            #     print e
+            except Exception, e:
+                print e
 
     def _check_inbox(self):
         while self.alive:
@@ -145,19 +151,28 @@ class NetworkedAgent(object):
     agents that have been registered onto an agents network,
     simulates its attributes
     """
-    def __init__(self, comm, host_group, agentname, agenttype, agentid, addr):
-        self.config = load_config(host_group, agentname)
+    def __init__(self, comm, collection, agentname, agenttype, agentid, addr):
+        self.config = load_config(collection, agentname)
         self.comm = comm
         self.config.agentname = agentname
         self.config.agentid = agentid
         self.config.address = addr
-        self.config.host_group = host_group
+        self.config.collection = collection
 
     def send_message_to(self, message):
         self.comm.write(message, self.config.address)
 
     def add_attribute(self, attribute, value):
         setattr(self, attribute, value)
+
+    def __repr__(self):
+        return str(self)
+
+    def __str__(self):
+        return '{0}'.format(', '.join([self.config.agentname,
+                                       self.config.agentid,
+                                       str(self.config.address),
+                                       self.config.collection]))
 
 # ##############################  Utilities  ##############################
 # #########################################################################
@@ -170,27 +185,30 @@ def load_commtype(commtype, agentconfig):
         raise NotImplementedError('commtype has not been defined!')
 
 
-def load_config(host_group, name):
+def load_config(collection, name):
+    """
+    loads config.collecion.name
+    """
     package = vespa.config
-    prefix = ".".join([package.__name__, host_group])
+    prefix = ".".join([package.__name__, collection])
     config = __import__('.'.join([prefix, name]), fromlist=package.__name__)
     config.Config.verify_override()
     return copy.deepcopy(config.Config)
 
 
-def get_type_from_config(host_group, agentname):
+def get_type_from_config(collection, agentname):
     pass
 
 
-def get_host_adress(host_group):
+def get_host_adress(collection):
     """
     Gets host address from host group
     If unable to get host address, endure that hostname has
-    been defined in the __init__ of the host_group.
-    see .config.host_group.__init__ for example
+    been defined in the __init__ of the collection.
+    see .config.collection.__init__ for example
     """
     package = vespa.config
-    module = '.'.join([package.__name__, host_group])
+    module = '.'.join([package.__name__, collection])
     module = __import__(module, fromlist=package.__name__)
     if module.host is not None:
         return module.host.Config.address
@@ -199,7 +217,7 @@ def get_host_adress(host_group):
 def get_default_parser():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--host_group',
+    parser.add_argument('--collection',
                         help='group that agent is a member of')
     parser.add_argument('--agent',
                         help='name of agent that is to be launched')

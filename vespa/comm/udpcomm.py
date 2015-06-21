@@ -5,7 +5,7 @@ import socket
 class UDPComm(Comm):
     def __init__(self, config):
         self.config = config
-        super(UDPComm, self).__init__(config)
+        super(UDPComm, self).__init__()
 
     def setup(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

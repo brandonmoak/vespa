@@ -36,12 +36,12 @@ class Message(object):
 
 
 class Registration(Message):
-    def __init__(self, host_group, name, agenttype, senderid, senderaddr):
+    def __init__(self, collection, name, agenttype, senderid, senderaddr):
         super(Registration, self).__init__(senderid, 'host')
         self.name = name
         self.senderaddr = senderaddr
         self.type = agenttype
-        self.host_group = host_group
+        self.collection = collection
 
 
 class Heartbeat(Message):

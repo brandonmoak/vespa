@@ -1,5 +1,5 @@
 import agent_base
-# from vespa.message.messagehandler import message_handler
+# from vespa.event.messagehandler import message_handler
 
 ###############################################################
 # Arguments passed from launching the agent
@@ -16,11 +16,13 @@ args = parser.parse_args()
 
 class Agent(agent_base.AgentBase):
     """
-    An agent is a node on the network, its process runs independantly of
-    other nodes on the nework, it loads a configuration file from config
-    directory. Each agent communicates through predefined messages that
-    can be subscribed to. A network of agents is called a host_group,
-    the host_group has a host that all nodes will initialize with, following
+    An actor is a node on the network, its process runs independantly of
+    other nodes on the nework, each node must register with the swarm executive to
+    get its positional information. An actor load a configuration file from 
+    config directory, which will define the workers(agents) that will execute commands
+    such as reading and writing to drivers. Each agent/actor communicates through predefined 
+    messages that can be subscribed to. A network of actors is called a collection,
+    the colleaction has an executive that all nodes will initialize with, following
     that the nodes can communicate with each other directly based on their
     specified function.
     """
@@ -54,4 +56,4 @@ class Agent(agent_base.AgentBase):
 # ##########################################################
 
 if __name__ == '__main__':
-    Agent(agent_base.load_config(args.agent), args)
+    Agent(agent_base.load_config(args.collection, args.agent), args)
