@@ -1,3 +1,3 @@
 # Vespa
 
-Python swarm library
+Python swarm framework
