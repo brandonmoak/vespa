@@ -1,4 +1,5 @@
 import agent_base
+import shape_agent
 
 parser = agent_base.get_default_parser()
 args = parser.parse_args()
@@ -7,6 +8,8 @@ args = parser.parse_args()
 class SwarmExecutive(agent_base.AgentBase):
     def __init__(self, config, args):
         super(SwarmExecutive, self).__init__(config, args)
+        self.handler.subscribe_to_event(shape_agent.ShapeUpdate,
+                                          self.on_shape_update)
 
     def tick(self, dt):
         """
@@ -14,10 +17,17 @@ class SwarmExecutive(agent_base.AgentBase):
         to process its own tasks
         """
         self.sleep(.5)
+        f = self.first_agent_with(agentname='first')
+        if f is not None:
+            print f.config.x, f.config.y
         positions = self.config.position_template(['first', 'centroid'])
         positions['first']['pos'] = [-3, -4]
         positions['centroid']['pos'] = [0, 0]
         print self.config.resolve(positions)
+
+    def on_shape_update(self, msg):
+        age = self.first_agent_with(agentid=msg.senderid)
+        age.config.x, age.config.y = msg.x, msg.y
 
     def broadcast_positions(self):
         """

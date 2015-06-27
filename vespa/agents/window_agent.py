@@ -1,4 +1,4 @@
-from vespa.event.message import Registration, Message
+from vespa.event.event import RegistrationRequest, Event
 from agent_base import AgentBase, get_default_parser, load_config
 import shape_agent
 import vespa.drivers.window as window
@@ -11,9 +11,8 @@ class WindowAgent(AgentBase):
             self.config.win_name,
             self.config.win_x,
             self.config.win_y)
-        self.handler.subscribe_to_message(Registration, self.create_new_shape)
-        self.handler.subscribe_to_message(shape_agent.ShapeUpdate,
-                                          self.position_update)
+        self.handler.subscribe_to_event(RegistrationRequest, self.create_new_shape)
+        self.handler.subscribe_to_event(shape_agent.ShapeUpdate, self.position_update)
 
     def tick(self, dt):
         pos = self.win.get_last_mouse_pos()
@@ -21,14 +20,14 @@ class WindowAgent(AgentBase):
             if (self.config.mouse_x, self.config.mouse_y) != pos:
                 self.logger.info(pos)
                 self.config.mouse_x, self.config.mouse_y = pos[0], pos[1]
-                self.message_all_agents(
+                self.event_all_agents(
                     MouseUpdate(self.config.agentid,
                                 'all',
                                 self.config.mouse_x,
                                 self.config.mouse_y))
 
     def create_new_shape(self, msg):
-        # find out who the message came from
+        # find out who the event came from
         self.logger.info(self.networkedagents)
         agent = next((i for i in self.networkedagents if
                       i.config.agentid == msg.senderid), None)
@@ -39,7 +38,7 @@ class WindowAgent(AgentBase):
             self.win.add_circle(msg.senderid, x=0, y=0, rad=10)
 
     def position_update(self, msg):
-        # find out who the message came from
+        # find out who the event came from
         agent = next((i for i in self.networkedagents if
                       i.config.agentid == msg.senderid), None)
         if agent is not None:
@@ -57,7 +56,7 @@ class WindowAgent(AgentBase):
                                        agent.config.y)
 
 
-class MouseUpdate(Message):
+class MouseUpdate(Event):
     def __init__(self, senderid, receiverid, x, y):
         super(MouseUpdate, self).__init__(senderid, receiverid)
         self.x = x

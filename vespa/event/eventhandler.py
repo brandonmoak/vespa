@@ -1,16 +1,16 @@
 import threading
 import time
-from message import Message
+from event import Event
 from vespa.utilities.helpers import Enum, generate_random_string
 from collections import deque
 
 HandlerStatus = Enum(['initialized', 'processing', 'error', 'stopped'])
 
 
-class MessageHandler:
+class EventHandler:
     """
-    to subscribe to messages from other agents the message_type
-    must be connected to the user defined function in the message handler
+    to subscribe to events from other agents the event_type
+    must be connected to the user defined function in the event handler
     """
     def __init__(self):
         self.lookup = {}
@@ -22,7 +22,7 @@ class MessageHandler:
 
     def _watch(self):
         """
-        watches the message handlers
+        watches the event handlers
         """
         while self.alive:
             _new = filter(lambda x:
@@ -48,36 +48,39 @@ class MessageHandler:
                 except Exception, e:
                     print e
 
-    def handle_message(self, msg):
-        message = Message.unflatten(msg)
-        if message.message_type in self.lookup:
+    def handle_event(self, event):
+        event = Event.unflatten(event)
+        if event.event_type in self.lookup:
             wid = generate_random_string()
-            for handler in list(self.lookup[message.message_type]):
+            for handler in list(self.lookup[event.event_type]):
                 self.workers.append(
                     {'_worker': threading.Thread(
                                     target=self.processor,
-                                    args=(handler, message, wid)),
+                                    args=(handler, event, wid)),
                      '_status': HandlerStatus.initialized,
                      '_workerid': wid}
                     )
         else:
-            #print 'unprocessed', message.__dict__
-            self.unprocessed.append(message)
+            #print 'unprocessed', event.__dict__
+            self.unprocessed.append(event)
 
-    def subscribe_to_message(self, messagetype, function):
-        if messagetype.__name__ not in self.lookup:
-            self.lookup[messagetype.__name__] = set()
-        self.lookup[messagetype.__name__].add(function)
+    def subscribe_to_event(self, eventtype, function):
+        if eventtype.__name__ not in self.lookup:
+            self.lookup[eventtype.__name__] = set()
+        self.lookup[eventtype.__name__].add(function)
 
-    def processor(self, handler, message, workerid):
+    def fire(self, event):
+        self.handle_event(event)
+
+    def processor(self, handler, event, workerid):
         '''
-        messages handlers will be processed here, ran in a separate thread
+        events handlers will be processed here, ran in a separate thread
         '''
         try:
-            handler(message)
+            handler(event)
         except Exception, e:
-            emsg = 'Error in handler - {0}: {1}'.format(handler.__name__, e)
-            print emsg
+            event = 'Error in handler - {0}: {1}'.format(handler.__name__, e)
+            print event
             worker = filter(
                 lambda x: x['_workerid'] == workerid, self.workers)[0]
             worker['_status'] = HandlerStatus.error
@@ -86,5 +89,5 @@ class MessageHandler:
         self.alive = False
 
 
-class InvalidMessageType(Exception):
+class InvalidEventType(Exception):
     pass

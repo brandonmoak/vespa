@@ -1,5 +1,5 @@
 import agent_base
-# from vespa.event.messagehandler import message_handler
+# from vespa.event.eventhandler import event_handler
 
 ###############################################################
 # Arguments passed from launching the agent
@@ -18,10 +18,10 @@ class Agent(agent_base.AgentBase):
     """
     An actor is a node on the network, its process runs independantly of
     other nodes on the nework, each node must register with the swarm executive to
-    get its positional information. An actor load a configuration file from 
+    get its positional information. An actor load a configuration file from
     config directory, which will define the workers(agents) that will execute commands
-    such as reading and writing to drivers. Each agent/actor communicates through predefined 
-    messages that can be subscribed to. A network of actors is called a collection,
+    such as reading and writing to drivers. Each agent/actor communicates through predefined
+    events that can be subscribed to. A network of actors is called a collection,
     the colleaction has an executive that all nodes will initialize with, following
     that the nodes can communicate with each other directly based on their
     specified function.
@@ -37,22 +37,21 @@ class Agent(agent_base.AgentBase):
         print 'tick'
 
 # ################# MESSAGE HANDLERS #######################
-# To subscribe message to predefined message type
+# To subscribe event to predefined event type
 #
-# self.handler.subscribe_to_message_type(message.Type,
-#                           self.how_to_handle_message)
+# self.handler.subscribe_to_event_type(event.Type,
+#                           self.how_to_handle_event)
 #
-# To create Message Handlers
-# @message_handler(message.Type)
-# def how_to_handle_message(self, message):
-#     message.contains.attributes
+# To create Event Handlers
+# def how_to_handle_event(self, event):
+#     event.contains.attributes
 # ##########################################################
 
 
 # ################# NETWORKED AGENTS #######################
 # To communicate with agents seen on the network that have
 # been predefined in config
-# self.networkedagents['name'].send_to(message)
+# self.networkedagents['name'].send_to(event)
 # ##########################################################
 
 if __name__ == '__main__':

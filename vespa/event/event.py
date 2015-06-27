@@ -4,22 +4,22 @@ import pickle
 from vespa.utilities.helpers import generate_random_string
 
 
-class Message(object):
+class Event(object):
     """
-    Base message class, to be overridden to create specific message types
+    Base event class, to be overridden to create specific event types
     """
-    messageid = None
+    eventid = None
     senderid = None
     recieverid = None
-    messageid = None
+    eventid = None
     timestamp = None
 
     def __init__(self, senderid, recieverid):
         self.senderid = senderid
         self.recieverid = recieverid
-        self.messageid = generate_random_string()
+        self.eventid = generate_random_string()
         self.timestamp = time.time()
-        self.message_type = str(self)
+        self.event_type = str(self)
 
     def __str__(self):
         return self.__class__.__name__
@@ -32,21 +32,29 @@ class Message(object):
     @classmethod
     def unflatten(self, msg):
         return pickle.loads(msg)
-        # recontruct message object
+        # recontruct event object
 
 
-class Registration(Message):
+class RegistrationRequest(Event):
     def __init__(self, collection, name, agenttype, senderid, senderaddr):
-        super(Registration, self).__init__(senderid, 'host')
+        super(RegistrationRequest, self).__init__(senderid, 'exec')
         self.name = name
         self.senderaddr = senderaddr
         self.type = agenttype
         self.collection = collection
 
 
-class Heartbeat(Message):
+class RegistrationConfirmed(Event):
+    def __init__(self, collection, name, agenttype, senderid):
+        super(RegistrationConfirmed, self).__init__(senderid, 'undefined')
+        self.name = name
+        self.type = agenttype
+        self.collection = collection
+
+
+class Heartbeat(Event):
     pass
 
 
-class Shutdown(Message):
+class Shutdown(Event):
     pass

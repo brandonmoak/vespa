@@ -1,13 +1,13 @@
 import agent_base
 import time
 
-from vespa.event.message import Registration
+from vespa.event.event import RegistrationRequest
 
 
 class BasicAgent(agent_base.AgentBase):
     def __init__(self, config, args):
         super(BasicAgent, self).__init__(config, args)
-        self.handler.subscribe_to_message(Registration, self.on_register)
+        self.handler.subscribe_to_event(RegistrationRequest, self.on_register)
 
     def on_register(self, msg):
         self.logger.info('on registration')

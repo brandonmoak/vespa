@@ -1,12 +1,12 @@
 from agent_base import AgentBase, get_default_parser, load_config
-import vespa.event.message as message
+import vespa.event.event as event
 import window_agent
 
 
 class ShapeAgent(AgentBase):
     def __init__(self, config, args):
         super(ShapeAgent, self).__init__(config, args)
-        self.handler.subscribe_to_message(window_agent.MouseUpdate, self.on_mouse_update)
+        self.handler.subscribe_to_event(window_agent.MouseUpdate, self.on_mouse_update)
 
     def tick(self, dt):
         pass
@@ -15,7 +15,7 @@ class ShapeAgent(AgentBase):
         self.logger.info([msg.timestamp, msg.x, msg.y])
         self.config.x = msg.x
         self.config.y = msg.y
-        self.message_all_agents(
+        self.event_all_agents(
             ShapeUpdate(self.config.agentid,
                         'all',
                         self.config.x,
@@ -27,7 +27,7 @@ class ShapeAgent(AgentBase):
         self.config.y += dy
 
 
-class ShapeUpdate(message.Message):
+class ShapeUpdate(event.Event):
     def __init__(self, senderid, receiverid, x, y, size):
         super(ShapeUpdate, self).__init__(senderid, receiverid)
         self.x = x
