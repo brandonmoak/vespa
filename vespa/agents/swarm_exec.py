@@ -8,8 +8,7 @@ args = parser.parse_args()
 class SwarmExecutive(agent_base.AgentBase):
     def __init__(self, config, args):
         super(SwarmExecutive, self).__init__(config, args)
-        self.handler.subscribe_to_event(shape_agent.ShapeUpdate,
-                                          self.on_shape_update)
+        self.handler.subscribe_to_event(shape_agent.ShapeUpdate, self.on_shape_update)
 
     def tick(self, dt):
         """

@@ -10,13 +10,11 @@ class Event(object):
     """
     eventid = None
     senderid = None
-    recieverid = None
     eventid = None
     timestamp = None
 
-    def __init__(self, senderid, recieverid):
+    def __init__(self, senderid):
         self.senderid = senderid
-        self.recieverid = recieverid
         self.eventid = generate_random_string()
         self.timestamp = time.time()
         self.event_type = str(self)
@@ -37,7 +35,7 @@ class Event(object):
 
 class RegistrationRequest(Event):
     def __init__(self, collection, name, agenttype, senderid, senderaddr):
-        super(RegistrationRequest, self).__init__(senderid, 'exec')
+        super(RegistrationRequest, self).__init__(senderid)
         self.name = name
         self.senderaddr = senderaddr
         self.type = agenttype
@@ -46,7 +44,7 @@ class RegistrationRequest(Event):
 
 class RegistrationConfirmed(Event):
     def __init__(self, collection, name, agenttype, senderid):
-        super(RegistrationConfirmed, self).__init__(senderid, 'undefined')
+        super(RegistrationConfirmed, self).__init__(senderid)
         self.name = name
         self.type = agenttype
         self.collection = collection

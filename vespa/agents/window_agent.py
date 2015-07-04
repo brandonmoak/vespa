@@ -58,7 +58,7 @@ class WindowAgent(AgentBase):
 
 class MouseUpdate(Event):
     def __init__(self, senderid, receiverid, x, y):
-        super(MouseUpdate, self).__init__(senderid, receiverid)
+        super(MouseUpdate, self).__init__(senderid)
         self.x = x
         self.y = y
 

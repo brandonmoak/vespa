@@ -3,5 +3,5 @@ import constraints
 
 
 class Config(swarm_exec.Config):
-    address = ('127.0.0.1', 45010)
+    address = ('127.0.0.2', 45001)
     constraints = constraints.defined_constraints

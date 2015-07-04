@@ -29,7 +29,7 @@ class ShapeAgent(AgentBase):
 
 class ShapeUpdate(event.Event):
     def __init__(self, senderid, receiverid, x, y, size):
-        super(ShapeUpdate, self).__init__(senderid, receiverid)
+        super(ShapeUpdate, self).__init__(senderid)
         self.x = x
         self.y = y
         self.size = size
