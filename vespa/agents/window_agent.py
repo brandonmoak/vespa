@@ -1,18 +1,19 @@
 from vespa.event.event import RegistrationRequest, Event
-from agent_base import AgentBase, get_default_parser, load_config
+from agent_base import AgentBase, load_config
 import shape_agent
 import vespa.drivers.window as window
+from vespa.utilities.util import get_default_parser
 
 
 class WindowAgent(AgentBase):
-    def __init__(self, config, args):
-        super(WindowAgent, self).__init__(config, args)
+    def __init__(self, config, args, networkedagents, localagents, events):
+        super(WindowAgent, self).__init__(config, args, networkedagents, localagents, events)
         self.win = window.Window(
             self.config.win_name,
             self.config.win_x,
             self.config.win_y)
-        self.handler.subscribe_to_event(RegistrationRequest, self.create_new_shape)
-        self.handler.subscribe_to_event(shape_agent.ShapeUpdate, self.position_update)
+        self.events.subscribe_to_event(RegistrationRequest, self.create_new_shape)
+        self.events.subscribe_to_event(shape_agent.ShapeUpdate, self.position_update)
 
     def tick(self, dt):
         pos = self.win.get_last_mouse_pos()

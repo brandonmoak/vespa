@@ -1,12 +1,13 @@
-from agent_base import AgentBase, get_default_parser, load_config
+from agent_base import AgentBase, load_config
+from vespa.utilities.util import get_default_parser
 import vespa.event.event as event
 import window_agent
 
 
 class ShapeAgent(AgentBase):
-    def __init__(self, config, args):
-        super(ShapeAgent, self).__init__(config, args)
-        self.handler.subscribe_to_event(window_agent.MouseUpdate, self.on_mouse_update)
+    def __init__(self, config, args, networkedagents, localagents, events):
+        super(ShapeAgent, self).__init__(config, args, networkedagents, localagents, events)
+        self.events.subscribe_to_event(window_agent.MouseUpdate, self.on_mouse_update)
 
     def tick(self, dt):
         pass

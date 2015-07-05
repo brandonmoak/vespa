@@ -1,14 +1,15 @@
 import agent_base
 import shape_agent
+from vespa.utilities.util import get_default_parser
 
-parser = agent_base.get_default_parser()
+parser = get_default_parser()
 args = parser.parse_args()
 
 
 class SwarmExecutive(agent_base.AgentBase):
-    def __init__(self, config, args):
-        super(SwarmExecutive, self).__init__(config, args)
-        self.handler.subscribe_to_event(shape_agent.ShapeUpdate, self.on_shape_update)
+    def __init__(self, config, args, networkedagents, localagents, events):
+        super(SwarmExecutive, self).__init__(config, args, networkedagents, localagents, events)
+        self.events.subscribe_to_event(shape_agent.ShapeUpdate, self.on_shape_update)
 
     def tick(self, dt):
         """

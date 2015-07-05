@@ -1,4 +1,4 @@
-import vespa.config.agent as agent
+import vespa.config.agents.agent as agent
 import vespa.agents.basic_agent
 
 

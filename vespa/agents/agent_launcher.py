@@ -1,4 +1,5 @@
-from agent_base import get_default_parser, load_config
+from agent_base import load_config
+from vespa.utilities.util import get_default_parser
 
 parser = get_default_parser()
 

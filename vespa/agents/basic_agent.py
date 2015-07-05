@@ -1,13 +1,14 @@
 import agent_base
 import time
+from vespa.utilities.util import get_default_parser
 
 from vespa.event.event import RegistrationRequest
 
 
 class BasicAgent(agent_base.AgentBase):
-    def __init__(self, config, args):
-        super(BasicAgent, self).__init__(config, args)
-        self.handler.subscribe_to_event(RegistrationRequest, self.on_register)
+    def __init__(self, config, args, networkedagents, localagents, events):
+        super(BasicAgent, self).__init__(config, args, networkedagents, localagents, events)
+        self.events.subscribe_to_event(RegistrationRequest, self.on_register)
 
     def on_register(self, msg):
         self.logger.info('on registration')
@@ -20,7 +21,7 @@ class BasicAgent(agent_base.AgentBase):
                               netagent.config.agentid])
         time.sleep(.5)
 
-parser = agent_base.get_default_parser()
+parser = get_default_parser()
 args = parser.parse_args()
 
 if __name__ == '__main__':

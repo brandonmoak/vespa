@@ -10,12 +10,6 @@ class Config(config_base.Config):
     """
     # reference to the Agent class that will run
     _launcher = config_base.OverrideRequired
-    # location of agent
-    address = config_base.OverrideRequired
-    # port
-    # port = 45750
-    # address of host agent
-    hostaddr = object
     # agent id generated when agent spawns
     agentid = str
     # name of agent

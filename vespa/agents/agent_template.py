@@ -1,12 +1,12 @@
 import agent_base
-# from vespa.event.eventhandler import event_handler
+from vespa.utilities.util import get_default_parser
 
 ###############################################################
 # Arguments passed from launching the agent
 # to add argument try parser.add_argument()
 ###############################################################
 
-parser = agent_base.get_default_parser()
+parser = get_default_parser()
 args = parser.parse_args()
 
 
@@ -26,8 +26,8 @@ class Agent(agent_base.AgentBase):
     that the nodes can communicate with each other directly based on their
     specified function.
     """
-    def __init__(self, config, args):
-        super(Agent, self).__init__(config, args)
+    def __init__(self, config, args, networkedagents):
+        super(Agent, self).__init__(config, args, networkedagents, localagents, events)
 
     def tick(self, dt):
         """
@@ -39,7 +39,7 @@ class Agent(agent_base.AgentBase):
 # ################# MESSAGE HANDLERS #######################
 # To subscribe event to predefined event type
 #
-# self.handler.subscribe_to_event_type(event.Type,
+# self.events.subscribe_to_event_type(event.Type,
 #                           self.how_to_handle_event)
 #
 # To create Event Handlers

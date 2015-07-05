@@ -1,4 +1,4 @@
-import vespa.config.agent as agent
+import vespa.config.agents.agent as agent
 import vespa.agents.swarm_exec
 import config_base
 
