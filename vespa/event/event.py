@@ -9,7 +9,7 @@ class Event(object):
     Base event class, to be overridden to create specific event types
 
     """
-    def __init__(self, senderid, event_type, target='local', **data):
+    def __init__(self, senderid, event_type, **data):
         # Uses KWARGS for data to be passed in the event object, keywords must match the
         # attrs in the event type.
         assert issubclass(event_type, EventType)
@@ -17,7 +17,6 @@ class Event(object):
         self.eventid = generate_random_string()
         self.timestamp = time.time()
         self.event_type = event_type
-        self.target = target
         self.data = data
         self.check_data_from_kwargs()
 
@@ -43,9 +42,9 @@ class Event(object):
         # recontruct event object
 
 # ##################### Target Type ###########################
-# message can be sent to, all, local, or specific agentid
+# message can be sent to, all, local, networked
 
-Target = Enum(['local', 'all'])
+BroadcastLevel = Enum(['local', 'all', 'networked'])
 
 
 # ##################### Event Type ############################
@@ -53,6 +52,9 @@ Target = Enum(['local', 'all'])
 
 class EventType:
     attrs = []
+
+class TransAction:
+    attrs = ['event', 'interface', 'target']
 
 
 class RegistrationRequest(EventType):

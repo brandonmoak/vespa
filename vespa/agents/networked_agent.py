@@ -1,4 +1,5 @@
-import vespa.event.event as Event
+from vespa.event.event import TransAction, Event
+
 
 class NetworkedAgent(object):
     """
@@ -11,9 +12,15 @@ class NetworkedAgent(object):
         self.status = 'initialized'
 
     def add_event_to_inbox(self, event):
-        base_message = event.flatten()
-        transaction = Event.TransAction
-        self.link.write(event, self.config.address)
+        data = event.flatten()
+
+        transaction = Event(event.senderid,
+                            TransAction,
+                            target=self.identifier.agentid,
+                            event=data,
+                            interface='default')
+
+        self.link.write(transaction.flatten(), self.address)
 
     def add_attribute(self, attribute, value):
         setattr(self, attribute, value)
@@ -29,8 +36,9 @@ class NetworkedAgent(object):
 
 
 class AgentIdentifier(object):
-    agent_type
-    agent_name
-    agent_id
-    interface
-    parent_actor
+    def __init__(self, agenttype, agentname, agentid, interface, actor):
+        self.agenttype = agenttype
+        self.agentname = agentname
+        self.agentid = agentid
+        self.interface = interface
+        self.actor = actor
