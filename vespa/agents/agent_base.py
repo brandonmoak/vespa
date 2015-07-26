@@ -1,10 +1,12 @@
 import threading
 import time
 import copy
+from collections import deque
 
 import vespa.event.event as event
 import vespa.config
 
+from vespa.event.event import Event
 from vespa.event.eventhandler import EventHandler
 from vespa.utilities.util import generate_random_string
 from vespa.utilities.log import LoggingMixIn
@@ -20,9 +22,11 @@ class AgentBase(LoggingMixIn):
         commtype, collection = args.commtype, args.collection
 
         self.networkedagents = networkedagents
-        self.events = events
         self.localagents = localagents
+        self.events = events
         self.config = config
+        self.inbox = deque(maxlen=100)
+        self.handler = EventHandler(self.inbox)
 
         self.config.hostaddr = get_host_adress(collection)
         self.config.agentid = generate_random_string()
@@ -30,8 +34,6 @@ class AgentBase(LoggingMixIn):
         self.config.commtype = commtype
 
         self.timer(1, self._spawn_threads)
-
-        # self.timer(2, self.register_with_exec)
 
         self.logger.info('[AGENT] ' + ', '.join([self.config.name,
                                                 self.config.agentid]))
@@ -45,25 +47,6 @@ class AgentBase(LoggingMixIn):
     # ########################## Public functions #############################
     # #########################################################################
 
-    def register_with_exec(self):
-        self.enqueue_event(
-            event.RegistrationRequest(
-                self.config.collection,
-                self.config.name,
-                type(self),
-                self.config.agentid,
-                self.config.address
-            ), self.config.hostaddr)
-
-    def enqueue_event(self, event, destination):
-        e = event.flatten()
-        raise NotImplementedError
-        # self.comm.write(e, destination)
-
-    def event_all_agents(self, e):
-        for netagent in self.networkedagents:
-            netagent.send_event_to(e.flatten())
-
     def kill(self):
         raise NotImplementedError
         self.alive = False
@@ -75,23 +58,41 @@ class AgentBase(LoggingMixIn):
         t = threading.Timer(timeout, function, *args, **kwargs)
         t.start()
 
-    # ########################### Event Handlers ############################
+    def fire_event(self, event_type, data):
+        self.events.forward(Event(self.agentid, event_type, data))
+
+    # ####################### Event Handler Functions #########################
     # #########################################################################
 
-    def filter_agents(self, agentname=None, agentid=None, agenttype=None, address=None):
+    def add_event_handler(self, eventtype, function):
+        self.event.subscribe_to_event(self.agentid, event, function)
+
+    # ########################## Agent functions ##############################
+    # #########################################################################
+
+    def filter_networked_agents(self, agentname=None, agentid=None, agenttype=None, address=None):
+        return self.filter_agents(self.networkedagents)
+
+    def filter_local_agents(self, agentname=None, agentid=None, agenttype=None, address=None):
+        return self.filter_agents(self.localagents)
+
+    def filter_agents(self, agentlist, agentname=None, agentid=None, agenttype=None, address=None):
         params = {'agentname': agentname,
                   'agentid': agentid,
                   'agenttype': agenttype,
                   'address': address}
-        fil = self.networkedagents
+        fil = self.agentlist
         for k, val in params.iteritems():
             if val is not None:
                 fil = filter(lambda x: getattr(x.config, k) == val, fil)
         return fil
 
-    def first_agent_with(self, agentname=None, agentid=None, agenttype=None, address=None):
-        fil = self.filter_agents(agentname, agentid, agenttype, address)
+    def first_agent_with(self, agentlist, agentname=None, agentid=None, agenttype=None, address=None):
+        fil = self.filter_agents(agentlist, agentname, agentid, agenttype, address)
         return fil[0] if len(fil) > 0 else None
+
+    def add_event_to_inbox(self, event):
+        self.inbox.append(event)
 
     # ########################### Private functions ###########################
     # #########################################################################
@@ -117,7 +118,6 @@ class AgentBase(LoggingMixIn):
 
 # ##############################  Utilities  ##############################
 # #########################################################################
-
 
 def load_config(package, name):
     """

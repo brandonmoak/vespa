@@ -12,9 +12,9 @@ class Entity(actor.Actor):
 
     def __init__(self, args):
         super(Entity, self).__init__(args)
-        self.load_entity_agents(args.actor)
+        self.load_entitys_agents(args.actor)
 
-    def load_entity_agents(self, entity):
+    def load_entitys_agents(self, entity):
         """
         loads config.package.name
         """
@@ -25,6 +25,8 @@ class Entity(actor.Actor):
         for agent in a:
             self.launch_agent(load_config('.'.join(['entities', entity]), agent))
 
+    def register_with_exec(self):
+        pass
 
     def swarm(self):
         pass
@@ -35,6 +37,6 @@ class Entity(actor.Actor):
     def register_with_executive(self):
         pass
 
-    
+
 if __name__ == '__main__':
     Entity(args)

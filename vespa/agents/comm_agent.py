@@ -1,8 +1,10 @@
 import agent_base
 from vespa.utilities.util import get_default_parser
+import vespa.event.event as event
 from collections import deque
 import socket
 import threading
+import time
 
 parser = get_default_parser()
 args = parser.parse_args()
@@ -20,7 +22,6 @@ class CommAgent(agent_base.AgentBase):
     def spawn_threads(self):
         self._inbox = threading.Thread(target=self._check_inbox)
         self._inbox.start()
-
 
     def tick(self, dt):
         """
@@ -83,11 +84,10 @@ class CommAgent(agent_base.AgentBase):
 
 class NetworkedAgent(object):
     """
-    agents that have been registered onto an agents network,
-    simulates its attributes
+    agents that have been registered onto an actors network
     """
     def __init__(self, comm, collection, agentname, agenttype, agentid, actor):
-        self.config = load_config(collection, agentname)
+        self.config = {}
         self.comm = comm
         self.config.agentname = agentname
         self.config.agenttype = agenttype

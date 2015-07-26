@@ -1,6 +1,5 @@
 import threading
 import time
-from event import Event
 from vespa.utilities.helpers import Enum, generate_random_string
 from collections import deque
 
@@ -12,13 +11,22 @@ class EventHandler:
     to subscribe to events from other agents the event_type
     must be connected to the user defined function in the event handler
     """
-    def __init__(self):
+    def __init__(self, inbox):
+        self.inbox = inbox
         self.lookup = {}
         self.workers = []
         self.unprocessed = deque(maxlen=200)
         self.alive = True
+        self._inbox = threading.Thread(target=self._monitor_inbox)
         self._watcher = threading.Thread(target=self._watch)
+        self._inbox.start()
         self._watcher.start()
+
+    def _monitor_inbox(self):
+        while self.alive:
+            if len(self.inbox) > 0:
+                e = self.inbox.popleft()
+                self.handle_event(e)
 
     def _watch(self):
         """
@@ -49,10 +57,9 @@ class EventHandler:
                     print e
 
     def handle_event(self, event):
-        event = Event.unflatten(event)
         if event.event_type in self.lookup:
             wid = generate_random_string()
-            for handler in list(self.lookup[event.event_type]):
+            for handler in self.lookup[event.event_type]:
                 self.workers.append(
                     {'_worker': threading.Thread(
                                     target=self.processor,
@@ -66,15 +73,12 @@ class EventHandler:
 
     def subscribe_to_event(self, eventtype, function):
         if eventtype.__name__ not in self.lookup:
-            self.lookup[eventtype.__name__] = set()
-        self.lookup[eventtype.__name__].add(function)
-
-    def fire(self, event):
-        self.handle_event(event)
+            self.lookup[eventtype.__name__] = []
+        self.lookup[eventtype.__name__].append(function)
 
     def processor(self, handler, event, workerid):
         '''
-        events handlers will be processed here, ran in a separate thread
+        events handlers will be processed here, ran in its own thread
         '''
         try:
             handler(event)
@@ -89,5 +93,13 @@ class EventHandler:
         self.alive = False
 
 
-class InvalidEventType(Exception):
-    pass
+
+
+
+
+# runs independently of agents
+# agents can subscribe to message type, sender_agent_type, 
+# agents can fire event
+# message can be sent to specific agent?
+
+# event.fire(event.update)
