@@ -6,7 +6,7 @@ from collections import deque
 import vespa.event.event as event
 import vespa.config
 
-from vespa.event.event import Event
+from vespa.event.event import Event, LocalRegistrationConfirmed
 from vespa.event.eventhandler import EventHandler
 from vespa.utilities.util import generate_random_string
 from vespa.utilities.log import LoggingMixIn
@@ -16,10 +16,9 @@ class AgentBase(LoggingMixIn):
     """
     Base class for each agent, handles all communication between agents
     """
-    def __init__(self, config, args, networkedagents, localagents, events):
+    def __init__(self, config, networkedagents, localagents, events, args):
         super(AgentBase, self).__init__(args)
         self.alive = True
-        commtype, collection = args.commtype, args.collection
 
         self.networkedagents = networkedagents
         self.localagents = localagents
@@ -28,12 +27,13 @@ class AgentBase(LoggingMixIn):
         self.inbox = deque(maxlen=100)
         self.handler = EventHandler(self.inbox)
 
-        self.config.hostaddr = get_host_adress(collection)
         self.config.agentid = generate_random_string()
-        self.config.name = config.name
-        self.config.commtype = commtype
+        self.config.actor = args.actor
 
-        self.timer(1, self._spawn_threads)
+        self.timer(.5, self._spawn_threads)
+        self.timer(1, self._register_agent_locally)
+
+        self.handler.subscribe_to_event(LocalRegistrationConfirmed, self._on_registration_confirmation)
 
         self.logger.info('[AGENT] ' + ', '.join([self.config.name,
                                                 self.config.agentid]))
@@ -65,7 +65,7 @@ class AgentBase(LoggingMixIn):
     # #########################################################################
 
     def add_event_handler(self, eventtype, function):
-        self.event.subscribe_to_event(self.agentid, event, function)
+        self.handler.subscribe_to_event(eventtype, function)
 
     # ########################## Agent functions ##############################
     # #########################################################################
@@ -81,7 +81,7 @@ class AgentBase(LoggingMixIn):
                   'agentid': agentid,
                   'agenttype': agenttype,
                   'address': address}
-        fil = self.agentlist
+        fil = agentlist
         for k, val in params.iteritems():
             if val is not None:
                 fil = filter(lambda x: getattr(x.config, k) == val, fil)
@@ -91,11 +91,25 @@ class AgentBase(LoggingMixIn):
         fil = self.filter_agents(agentlist, agentname, agentid, agenttype, address)
         return fil[0] if len(fil) > 0 else None
 
-    def add_event_to_inbox(self, event):
-        self.inbox.append(event)
+    def add_event_to_inbox(self, e):
+        self.inbox.append(e)
+
 
     # ########################### Private functions ###########################
     # #########################################################################
+
+    def _on_registration_confirmation(self, e):
+        print 'regirtration confirmed'
+
+    def _register_agent_locally(self):
+
+        e = event.Event(self.config.agentid,
+                        event.LocalRegistrationRequest,
+                        name=self.config.name,
+                        actor=self.config.actor,
+                        interfaces=None)
+        self.logger.debug('Registering with: {0}'.format(e))
+        self.events.forward(e)
 
     def _spawn_threads(self):
         self.ticker = threading.Thread(target=self._tick)

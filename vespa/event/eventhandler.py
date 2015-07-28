@@ -26,7 +26,7 @@ class EventHandler:
         while self.alive:
             if len(self.inbox) > 0:
                 e = self.inbox.popleft()
-                self.handle_event(e)
+                self.handle_events(e)
 
     def _watch(self):
         """
@@ -56,7 +56,7 @@ class EventHandler:
                 except Exception, e:
                     print e
 
-    def handle_event(self, event):
+    def handle_events(self, event):
         if event.event_type in self.lookup:
             wid = generate_random_string()
             for handler in self.lookup[event.event_type]:
@@ -68,26 +68,29 @@ class EventHandler:
                      '_workerid': wid}
                     )
         else:
-            #print 'unprocessed', event.__dict__
+            # print 'unprocessed', event.__dict__
             self.unprocessed.append(event)
 
-    def subscribe_to_event(self, eventtype, function):
-        if eventtype.__name__ not in self.lookup:
-            self.lookup[eventtype.__name__] = []
-        self.lookup[eventtype.__name__].append(function)
+    def subscribe_to_event(self, event_type, function):
+        if event_type not in self.lookup:
+            self.lookup[event_type] = []
+        self.lookup[event_type].append(function)
 
     def processor(self, handler, event, workerid):
         '''
         events handlers will be processed here, ran in its own thread
         '''
+        print 'processing', event
+        status = None
         try:
             handler(event)
+            status = HandlerStatus.stopped
         except Exception, e:
-            event = 'Error in handler - {0}: {1}'.format(handler.__name__, e)
-            print event
-            worker = filter(
-                lambda x: x['_workerid'] == workerid, self.workers)[0]
-            worker['_status'] = HandlerStatus.error
+            print 'Error in handler - {0}: {1}'.format(handler.__name__, e)
+            status = HandlerStatus.error
+
+        worker = filter(lambda x: x['_workerid'] == workerid, self.workers)[0]
+        worker['_status'] = status
 
     def shutdown(self):
         self.alive = False

@@ -5,8 +5,8 @@ import window_agent
 
 
 class ShapeAgent(AgentBase):
-    def __init__(self, config, args, networkedagents, localagents, events):
-        super(ShapeAgent, self).__init__(config, args, networkedagents, localagents, events)
+    def __init__(self, config, networkedagents, localagents, events, args):
+        super(ShapeAgent, self).__init__(config, networkedagents, localagents, events, args)
         self.handler.subscribe_to_event(window_agent.MouseUpdate, self.on_mouse_update)
 
     def tick(self, dt):

@@ -3,13 +3,13 @@ import socket
 
 
 class UDPLink(Link):
-    def __init__(self, config):
-        self.config = config
+    def __init__(self, address):
+        self.address = address
         super(UDPLink, self).__init__()
 
     def setup(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.bind(self.config.address)
+        self.sock.bind(self.address)
 
         while not self.connected:
             try:

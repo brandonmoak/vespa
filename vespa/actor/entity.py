@@ -8,6 +8,10 @@ args = parser.parse_args()
 
 
 class Entity(actor.Actor):
+    """
+    Controls the state machine that will coordonate the swarm, fires general
+    events 
+    """
     actor_interface = actor.interfaces.Entity
 
     def __init__(self, args):

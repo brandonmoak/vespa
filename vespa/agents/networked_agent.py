@@ -5,10 +5,9 @@ class NetworkedAgent(object):
     """
     agents that have been registered onto an actors network
     """
-    def __init__(self, link, address, identifier):
+    def __init__(self, link, identifier):
         self.link = link
         self.identifier = identifier
-        self.address = address
         self.status = 'initialized'
 
     def add_event_to_inbox(self, event):
@@ -20,7 +19,7 @@ class NetworkedAgent(object):
                             event=data,
                             interface='default')
 
-        self.link.write(transaction.flatten(), self.address)
+        self.link.write(transaction.flatten(), self.identifier.address)
 
     def add_attribute(self, attribute, value):
         setattr(self, attribute, value)
@@ -29,14 +28,14 @@ class NetworkedAgent(object):
         return str(self)
 
     def __str__(self):
-        return '{0}'.format(', '.join([self.config.agentname,
-                                       self.config.agentid,
-                                       str(self.config.address),
-                                       self.config.collection]))
+        return '{0}'.format(', '.join([self.agentname,
+                                       self.agentid,
+                                       str(self.address),
+                                       self.collection]))
 
 
 class AgentIdentifier(object):
-    def __init__(self, agenttype, agentname, agentid, interface, actor):
+    def __init__(self, agenttype, agentname, agentid, interface, address, actor):
         self.agenttype = agenttype
         self.agentname = agentname
         self.agentid = agentid

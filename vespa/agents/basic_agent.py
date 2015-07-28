@@ -7,7 +7,7 @@ from vespa.event.event import RegistrationRequest
 
 class BasicAgent(agent_base.AgentBase):
     def __init__(self, config, args, networkedagents, localagents, events):
-        super(BasicAgent, self).__init__(config, args, networkedagents, localagents, events)
+        super(BasicAgent, self).__init__(config, networkedagents, localagents, events, args)
         self.events.subscribe_to_event(RegistrationRequest, self.on_register)
 
     def on_register(self, msg):

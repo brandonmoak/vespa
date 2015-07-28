@@ -35,23 +35,15 @@ def lanch_windows_simulation_locally():
                          creationflags=subprocess.CREATE_NEW_CONSOLE)
 # lanch_windows_simulation_locally()
 
-def launch_new():
-    collection = 'simulation'
-    commtype = 'udp'
-    entities = ['first']
-    executive = 'swarm_exec'
 
+def launch_new():
+    entities = ['first']
+    # executive = 'swarm_exec'
     for config in entities:
         subprocess.Popen([sys.executable,
                           'launcher.py',
                           '--actor', 'first',
-                          '--commtype', commtype,
-                          '--actortype', 'entity',
-                          '--collection', collection],
+                          '--actortype', 'entity'],
                          creationflags=subprocess.CREATE_NEW_CONSOLE)
 
 launch_new()
-
-
-
-

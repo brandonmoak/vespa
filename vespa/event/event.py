@@ -29,7 +29,11 @@ class Event(object):
                     'event object was not initialized with attribute: {0}'.format(attr))
 
     def __str__(self):
-        return self.__class__.__name__
+        return ', '.join(map(str, [self.senderid,
+                                   self.eventid,
+                                   self.timestamp,
+                                   self.event_type,
+                                   self.data]))
 
     def flatten(self):
         st = pickle.dumps(self)
@@ -53,16 +57,17 @@ BroadcastLevel = Enum(['local', 'all', 'networked'])
 class EventType:
     attrs = []
 
+
 class TransAction:
     attrs = ['event', 'interface', 'target']
 
 
-class RegistrationRequest(EventType):
-    attrs = ['name', 'senderaddr', 'actortype', 'interfaces']
+class LocalRegistrationRequest(EventType):
+    attrs = ['name', 'actor', 'interfaces']
 
 
-class RegistrationConfirmed(EventType):
-    attrs = ['name', 'senderaddr', 'actortype', 'interfaces']
+class LocalRegistrationConfirmed(EventType):
+    attrs = ['name', 'actor', 'interfaces']
 
 
 class Heartbeat(EventType):
@@ -71,3 +76,7 @@ class Heartbeat(EventType):
 
 class Shutdown(EventType):
     attrs = ['errors']
+
+
+class IdentifierExchange(EventType):
+    attrs = ['actor', 'address', 'identifiers']

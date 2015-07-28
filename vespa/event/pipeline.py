@@ -11,16 +11,12 @@ class Pipeline:
 
     def forward(self, event, interface='default', level=BroadcastLevel.local):
         # TODO add interface filter
-        print 'forwarding event: ', event.target, event
         if level == BroadcastLevel.local:
+            print self.local_agents
             for agent in self.local_agents:
                 agent.add_event_to_inbox(event)
         elif level == BroadcastLevel.all:
             for agent in self.local_agents + self.networkedagents:
                 agent.add_event_to_inbox(event)
         else:
-            try:
-                filter(lambda x: x.agentid == event.target,
-                       self.local_agents + self.networkedagents).add_event_to_inbox(event)
-            except:
-                print 'Unable to forward event: ', event
+            print 'pipeline.py: Unknown BroadcastLevel'

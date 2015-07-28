@@ -1,4 +1,3 @@
-import vespa.agents as agents
 import vespa.utilities.util as util
 import vespa.event.pipeline as pipe
 
@@ -24,14 +23,17 @@ class Actor(object):
 
     def launch_agent(self, agent_config):
         print 'launching agent', agent_config
-        self.local_agents.append(
-            agent_config._launcher(agent_config,
-                                   self.args,
-                                   self.net_agents,
-                                   self.local_agents,
-                                   self.events)
-            )
-        print self.local_agents
+
+        if not agent_config.suppress:
+            self.local_agents.append(
+                agent_config._launcher(agent_config,
+                                       self.net_agents,
+                                       self.local_agents,
+                                       self.events,
+                                       self.args)
+                )
+        else:
+            print 'suppressing agent', agent_config.name
 
     def handle_events(self):
         pass
